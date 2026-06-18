@@ -40,16 +40,16 @@ export default function ProjectCard({
 }: ProjectCardProps) {
     return (
         <motion.div
-            whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
+            whileHover={{ y: -6 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className={cn(
-                "group relative p-6 bg-surface border border-border rounded-lg hover:border-accent/30 transition-colors duration-300",
+                "group relative p-6 bg-surface/40 backdrop-blur-sm border border-border/85 rounded-2xl hover:border-accent/35 hover:bg-surface/60 hover:shadow-[0_0_30px_rgba(197,34,34,0.05)] transition-all duration-350",
                 className
             )}
         >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex items-start justify-between mb-5">
                 {/* Left icon: GitHub link if available, otherwise decorative */}
-                <div className="p-3 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors duration-300">
+                <div className="p-3 bg-accent/8 border border-accent/15 rounded-xl group-hover:bg-accent/12 group-hover:scale-105 transition-all duration-300">
                     {githubUrl ? (
                         <a
                             href={githubUrl}
@@ -58,10 +58,10 @@ export default function ProjectCard({
                             aria-label="View source code on GitHub"
                             className="block text-accent hover:text-foreground transition-colors"
                         >
-                            <GitHubIcon size={24} />
+                            <GitHubIcon size={22} />
                         </a>
                     ) : (
-                        <GitHubIcon size={24} className="text-accent" />
+                        <GitHubIcon size={22} className="text-accent" />
                     )}
                 </div>
 
@@ -73,18 +73,18 @@ export default function ProjectCard({
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="View live project"
-                            className="p-2 text-muted-foreground hover:text-accent transition-colors rounded-md hover:bg-accent/10"
+                            className="p-2 text-muted-foreground hover:text-accent border border-transparent hover:border-accent/15 rounded-lg hover:bg-accent/8 transition-all duration-300"
                         >
-                            <ExternalLink size={18} />
+                            <ExternalLink size={16} />
                         </a>
                     )}
                 </div>
             </div>
 
-            <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-accent transition-colors duration-300">
+            <h3 className="text-xl font-bold text-foreground mb-2.5 group-hover:text-accent transition-colors duration-300">
                 {title}
             </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-5">
                 {description}
             </p>
 
@@ -92,7 +92,7 @@ export default function ProjectCard({
                 {tags.map((tag) => (
                     <span
                         key={tag}
-                        className="px-2.5 py-1 text-xs font-mono bg-background border border-border rounded text-muted-foreground"
+                        className="px-3 py-1 text-[11px] font-mono tracking-wider uppercase bg-background/40 border border-border/70 rounded-full text-muted-foreground hover:border-accent/30 hover:text-foreground transition-all duration-200 cursor-default"
                     >
                         {tag}
                     </span>

@@ -93,7 +93,7 @@ export default function ContactForm() {
             <div>
                 <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-foreground mb-2"
+                    className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2"
                 >
                     Name
                 </label>
@@ -104,8 +104,8 @@ export default function ContactForm() {
                     value={formData.name}
                     onChange={handleChange}
                     className={cn(
-                        "w-full px-4 py-3 bg-surface border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200",
-                        errors.name ? "border-red-500" : "border-border hover:border-accent/30"
+                        "w-full px-4 py-3 bg-surface/30 border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent transition-all duration-300",
+                        errors.name ? "border-red-500/60 focus:ring-red-500/30" : "border-border/80 hover:border-accent/30"
                     )}
                     placeholder="John Doe"
                     aria-invalid={!!errors.name}
@@ -114,13 +114,13 @@ export default function ContactForm() {
                 <AnimatePresence>
                     {errors.name && (
                         <motion.p
-                            initial={{ opacity: 0, y: -10 }}
+                            initial={{ opacity: 0, y: -8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
+                            exit={{ opacity: 0, y: -8 }}
                             id="name-error"
-                            className="mt-1 text-sm text-red-400 flex items-center gap-1"
+                            className="mt-1.5 text-xs text-red-400 flex items-center gap-1 font-mono uppercase tracking-wider"
                         >
-                            <AlertCircle size={14} />
+                            <AlertCircle size={12} />
                             {errors.name}
                         </motion.p>
                     )}
@@ -130,9 +130,9 @@ export default function ContactForm() {
             <div>
                 <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-foreground mb-2"
+                    className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2"
                 >
-                    Email
+                    Email Address
                 </label>
                 <input
                     type="email"
@@ -141,8 +141,8 @@ export default function ContactForm() {
                     value={formData.email}
                     onChange={handleChange}
                     className={cn(
-                        "w-full px-4 py-3 bg-surface border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200",
-                        errors.email ? "border-red-500" : "border-border hover:border-accent/30"
+                        "w-full px-4 py-3 bg-surface/30 border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent transition-all duration-300",
+                        errors.email ? "border-red-500/60 focus:ring-red-500/30" : "border-border/80 hover:border-accent/30"
                     )}
                     placeholder="john@example.com"
                     aria-invalid={!!errors.email}
@@ -151,13 +151,13 @@ export default function ContactForm() {
                 <AnimatePresence>
                     {errors.email && (
                         <motion.p
-                            initial={{ opacity: 0, y: -10 }}
+                            initial={{ opacity: 0, y: -8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
+                            exit={{ opacity: 0, y: -8 }}
                             id="email-error"
-                            className="mt-1 text-sm text-red-400 flex items-center gap-1"
+                            className="mt-1.5 text-xs text-red-400 flex items-center gap-1 font-mono uppercase tracking-wider"
                         >
-                            <AlertCircle size={14} />
+                            <AlertCircle size={12} />
                             {errors.email}
                         </motion.p>
                     )}
@@ -167,7 +167,7 @@ export default function ContactForm() {
             <div>
                 <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-foreground mb-2"
+                    className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2"
                 >
                     Message
                 </label>
@@ -178,8 +178,8 @@ export default function ContactForm() {
                     onChange={handleChange}
                     rows={5}
                     className={cn(
-                        "w-full px-4 py-3 bg-surface border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all duration-200 resize-none",
-                        errors.message ? "border-red-500" : "border-border hover:border-accent/30"
+                        "w-full px-4 py-3 bg-surface/30 border rounded-xl text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent transition-all duration-300 resize-none",
+                        errors.message ? "border-red-500/60 focus:ring-red-500/30" : "border-border/80 hover:border-accent/30"
                     )}
                     placeholder="Tell me about your project or opportunity..."
                     aria-invalid={!!errors.message}
@@ -188,13 +188,13 @@ export default function ContactForm() {
                 <AnimatePresence>
                     {errors.message && (
                         <motion.p
-                            initial={{ opacity: 0, y: -10 }}
+                            initial={{ opacity: 0, y: -8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
+                            exit={{ opacity: 0, y: -8 }}
                             id="message-error"
-                            className="mt-1 text-sm text-red-400 flex items-center gap-1"
+                            className="mt-1.5 text-xs text-red-400 flex items-center gap-1 font-mono uppercase tracking-wider"
                         >
-                            <AlertCircle size={14} />
+                            <AlertCircle size={12} />
                             {errors.message}
                         </motion.p>
                     )}
@@ -205,25 +205,25 @@ export default function ContactForm() {
                 type="submit"
                 disabled={status === "submitting" || status === "success"}
                 className={cn(
-                    "w-full py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-all duration-300",
+                    "w-full py-3.5 px-6 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(197,34,34,0.06)] transition-all duration-350 cursor-pointer",
                     status === "success"
-                        ? "bg-accent text-background"
-                        : "bg-accent/10 text-accent border border-accent/30 hover:bg-accent hover:text-background"
+                        ? "bg-accent border border-accent text-white shadow-[0_0_20px_rgba(197,34,34,0.3)]"
+                        : "bg-accent/8 text-accent border border-accent/25 hover:bg-accent hover:text-white hover:border-accent hover:shadow-[0_0_20px_rgba(197,34,34,0.25)]"
                 )}
             >
                 {status === "submitting" ? (
                     <>
-                        <Loader2 size={18} className="animate-spin" />
+                        <Loader2 size={14} className="animate-spin" />
                         Sending...
                     </>
                 ) : status === "success" ? (
                     <>
-                        <CheckCircle size={18} />
+                        <CheckCircle size={14} />
                         Message Sent!
                     </>
                 ) : (
                     <>
-                        <Send size={18} />
+                        <Send size={14} />
                         Send Message
                     </>
                 )}
@@ -232,12 +232,12 @@ export default function ContactForm() {
             <AnimatePresence>
                 {status === "success" && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="p-4 bg-accent/10 border border-accent/30 rounded-lg text-center"
+                        exit={{ opacity: 0, y: 8 }}
+                        className="p-4 bg-accent/8 border border-accent/15 rounded-xl text-center shadow-sm"
                     >
-                        <p className="text-accent text-sm">
+                        <p className="text-accent text-xs font-mono uppercase tracking-wider">
                             Thank you for reaching out! I will get back to you soon.
                         </p>
                     </motion.div>
@@ -245,12 +245,12 @@ export default function ContactForm() {
 
                 {status === "error" && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center"
+                        exit={{ opacity: 0, y: 8 }}
+                        className="p-4 bg-red-500/8 border border-red-500/15 rounded-xl text-center shadow-sm"
                     >
-                        <p className="text-red-400 text-sm">
+                        <p className="text-red-400 text-xs font-mono uppercase tracking-wider">
                             Something went wrong. Please try again or email me directly.
                         </p>
                     </motion.div>

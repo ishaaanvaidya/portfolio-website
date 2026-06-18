@@ -41,25 +41,36 @@ export default function Hero() {
     return (
         <section
             id="hero"
-            className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8"
+            className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden"
         >
-            <div className="max-w-4xl mx-auto text-center">
+            {/* Background elements */}
+            <div className="absolute inset-0 -z-10 bg-grid mask-radial opacity-20" />
+            <div className="absolute inset-0 -z-10 bg-dot mask-radial opacity-35" />
+            
+            {/* Animated Glow Orbs */}
+            <div className="absolute inset-0 -z-10 overflow-hidden">
+                <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-accent/6 rounded-full blur-[90px] animate-float-slow" />
+                <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/4 rounded-full blur-[110px] animate-float-slower" />
+            </div>
+
+            <div className="max-w-4xl mx-auto text-center relative z-10">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="mb-6"
+                    transition={{ duration: 0.5, delay: 0.15 }}
+                    className="mb-8"
                 >
-                    <span className="font-mono text-accent text-sm tracking-wider uppercase">
+                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-accent/8 border border-accent/20 rounded-full text-xs font-mono tracking-widest uppercase text-accent shadow-[0_0_12px_rgba(197,34,34,0.06)] hover:border-accent/35 transition-colors duration-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
                         Computer Science Undergraduate
-                    </span>
+                    </div>
                 </motion.div>
 
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6"
+                    transition={{ duration: 0.5, delay: 0.25 }}
+                    className="text-5xl sm:text-6xl md:text-8xl font-extrabold tracking-tight bg-gradient-to-b from-neutral-50 via-neutral-100 to-neutral-500 bg-clip-text text-transparent mb-6 select-none"
                 >
                     Ishan Vaidya
                 </motion.h1>
@@ -67,26 +78,26 @@ export default function Hero() {
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
+                    transition={{ duration: 0.5, delay: 0.35 }}
+                    className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed text-balance"
                 >
                     Building intelligent systems at the intersection of{" "}
-                    <span className="text-foreground font-medium">Machine Learning</span>,{" "}
-                    <span className="text-foreground font-medium">Computer Vision</span>, and{" "}
-                    <span className="text-foreground font-medium">Software Engineering</span>
+                    <span className="text-accent font-semibold">Machine Learning</span>,{" "}
+                    <span className="text-accent font-semibold">Computer Vision</span>, and{" "}
+                    <span className="text-accent font-semibold">Software Engineering</span>
                 </motion.p>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 }}
-                    className="flex flex-wrap justify-center gap-3 mb-12"
+                    transition={{ duration: 0.5, delay: 0.45 }}
+                    className="flex flex-wrap justify-center gap-3.5 mb-14"
                 >
                     {["Machine Learning", "Computer Vision", "Software Development"].map(
                         (tag) => (
                             <span
                                 key={tag}
-                                className="px-4 py-2 text-sm font-mono border border-border rounded-full text-muted-foreground hover:border-accent/50 hover:text-accent transition-colors duration-300"
+                                className="px-5 py-2 text-xs font-mono uppercase tracking-wider bg-surface/50 border border-border/80 rounded-full text-muted-foreground hover:border-accent/40 hover:text-accent shadow-sm hover:shadow-[0_0_15px_rgba(197,34,34,0.06)] hover:bg-accent/5 transition-all duration-300 cursor-default"
                             >
                                 {tag}
                             </span>
@@ -97,8 +108,8 @@ export default function Hero() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
-                    className="flex justify-center gap-4 mb-16"
+                    transition={{ duration: 0.5, delay: 0.55 }}
+                    className="flex justify-center gap-5 mb-16"
                 >
                     {[
                         {
@@ -123,7 +134,7 @@ export default function Hero() {
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={label}
-                            className="p-3 text-muted-foreground hover:text-accent hover:bg-surface rounded-lg transition-all duration-300"
+                            className="p-3.5 text-muted-foreground hover:text-accent bg-surface/50 border border-border/80 hover:border-accent/30 rounded-xl shadow-sm hover:shadow-[0_0_15px_rgba(197,34,34,0.08)] hover:scale-105 transition-all duration-350"
                         >
                             <Icon size={20} />
                         </a>
@@ -133,20 +144,20 @@ export default function Hero() {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 1, duration: 0.5 }}
+                    transition={{ delay: 0.8, duration: 0.5 }}
                     className="absolute bottom-8 left-1/2 -translate-x-1/2"
                 >
                     <motion.div
                         animate={{ y: [0, 8, 0] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="cursor-pointer p-2 rounded-full hover:bg-surface border border-transparent hover:border-border/30 transition-colors"
+                        onClick={() => {
+                            document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
+                        }}
                     >
-                        <ArrowDown className="text-muted-foreground" size={20} />
+                        <ArrowDown className="text-muted-foreground hover:text-accent transition-colors" size={18} />
                     </motion.div>
                 </motion.div>
-            </div>
-
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl" />
             </div>
         </section>
     );

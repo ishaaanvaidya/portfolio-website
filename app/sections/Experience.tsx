@@ -3,7 +3,7 @@ import { Briefcase, Calendar } from "lucide-react";
 
 const experiences = [
     {
-        role: "Software Development Intern",
+        role: "AI/ML Intern",
         company: "Rams Creative Technologies Pvt. Ltd.",
         period: "Jun 2025 — Jul 2025",
         description:
@@ -20,70 +20,76 @@ export default function Experience() {
     return (
         <section
             id="experience"
-            className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 bg-surface/30"
+            className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 relative bg-surface/10 border-b border-border/20 overflow-hidden"
         >
-            <div className="max-w-4xl mx-auto">
+            <div className="absolute inset-0 -z-10 bg-dot mask-radial opacity-15" />
+
+            <div className="max-w-4xl mx-auto relative z-10">
                 <SectionReveal>
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="h-px flex-1 bg-border" />
-                        <span className="font-mono text-sm text-accent uppercase tracking-wider">
-                            Experience
+                    <div className="flex items-center gap-4 mb-16">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-border/80" />
+                        <span className="font-mono text-xs text-accent uppercase tracking-widest bg-accent/8 border border-accent/25 px-3 py-1 rounded-full">
+                            Journey
                         </span>
-                        <div className="h-px flex-1 bg-border" />
+                        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-border/80" />
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground text-center mb-16 leading-tight">
                         Professional Journey
                     </h2>
                 </SectionReveal>
 
                 <div className="relative">
-                    <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-border md:-translate-x-px" />
+                    {/* Tracing Beam Timeline Line */}
+                    <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-accent/60 to-transparent md:-translate-x-[1px]" />
 
                     {experiences.map((exp, index) => (
                         <SectionReveal key={exp.company} delay={index * 0.2}>
                             <div className="relative mb-12 last:mb-0">
-                                <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-3 h-3 bg-accent rounded-full border-4 border-background" />
+                                {/* Pulsing Timeline Bullet */}
+                                <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-4 h-4 bg-background border-2 border-accent rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(197,34,34,0.4)]">
+                                    <div className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
+                                </div>
 
                                 <div className="ml-12 md:ml-0 md:grid md:grid-cols-2 md:gap-8">
                                     <div className="hidden md:block md:text-right">
-                                        <div className="inline-flex items-center gap-2 text-muted-foreground font-mono text-sm">
-                                            <Calendar size={14} className="text-accent" />
+                                        <div className="inline-flex items-center gap-2 text-muted-foreground font-mono text-xs uppercase tracking-wider mt-5">
+                                            <Calendar size={12} className="text-accent" />
                                             {exp.period}
                                         </div>
                                     </div>
 
                                     <div className="md:col-start-2">
-                                        <div className="p-6 bg-surface border border-border rounded-lg hover:border-accent/30 transition-colors duration-300">
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <div className="p-2 bg-accent/10 rounded-lg">
+                                        <div className="group p-6 bg-surface/40 backdrop-blur-sm border border-border/80 rounded-2xl hover:border-accent/35 hover:bg-surface/65 hover:shadow-[0_0_25px_rgba(197,34,34,0.04)] transition-all duration-350 hover:scale-[1.01]">
+                                            <div className="flex items-center gap-3.5 mb-4">
+                                                <div className="p-2.5 bg-accent/8 border border-accent/15 rounded-xl group-hover:bg-accent/12 transition-all duration-300">
                                                     <Briefcase className="text-accent" size={18} />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-foreground">
+                                                    <h3 className="font-bold text-foreground group-hover:text-accent transition-colors duration-300 text-sm sm:text-base">
                                                         {exp.role}
                                                     </h3>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-xs text-muted-foreground">
                                                         {exp.company}
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 text-muted-foreground font-mono text-sm mb-4 md:hidden">
-                                                <Calendar size={14} className="text-accent" />
+                                            <div className="flex items-center gap-2 text-muted-foreground font-mono text-xs mb-4 md:hidden">
+                                                <Calendar size={12} className="text-accent" />
                                                 {exp.period}
                                             </div>
 
-                                            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                                            <p className="text-muted-foreground text-sm leading-relaxed mb-5">
                                                 {exp.description}
                                             </p>
 
-                                            <ul className="space-y-2">
+                                            <ul className="space-y-2.5">
                                                 {exp.highlights.map((highlight) => (
                                                     <li
                                                         key={highlight}
-                                                        className="flex items-start gap-2 text-sm text-muted-foreground"
+                                                        className="flex items-start gap-2.5 text-sm text-muted-foreground"
                                                     >
-                                                        <span className="text-accent mt-1.5">•</span>
+                                                        <span className="text-accent mt-1 text-xs select-none">•</span>
                                                         {highlight}
                                                     </li>
                                                 ))}

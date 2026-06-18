@@ -1,5 +1,6 @@
 import Navbar from "./components/Navbar";
 import ScrollProgress from "./components/ScrollProgress";
+import StarryBackground from "./components/StarryBackground";
 import Hero from "./sections/Hero";
 import About from "./sections/About";
 import Projects from "./sections/Projects";
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <main className="relative">
       <ScrollProgress />
+      <StarryBackground />
       <Navbar />
       <Hero />
       <About />

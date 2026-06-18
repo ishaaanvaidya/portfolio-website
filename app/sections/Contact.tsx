@@ -66,39 +66,44 @@ export default function Contact() {
     return (
         <section
             id="contact"
-            className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8"
+            className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
         >
-            <div className="max-w-4xl mx-auto">
+            <div className="absolute inset-0 -z-10 bg-dot mask-radial opacity-20" />
+            
+            <div className="max-w-4xl mx-auto relative z-10">
                 <SectionReveal>
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="h-px flex-1 bg-border" />
-                        <span className="font-mono text-sm text-accent uppercase tracking-wider">
+                    <div className="flex items-center gap-4 mb-16">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-border/80" />
+                        <span className="font-mono text-xs text-accent uppercase tracking-widest bg-accent/8 border border-accent/25 px-3 py-1 rounded-full">
                             Contact
                         </span>
-                        <div className="h-px flex-1 bg-border" />
+                        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-border/80" />
                     </div>
-                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground text-center mb-4">
+                    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground text-center mb-4 leading-tight">
                         Let&apos;s Work Together
                     </h2>
-                    <p className="text-muted-foreground text-center max-w-xl mx-auto mb-12">
+                    <p className="text-muted-foreground text-center text-sm sm:text-base max-w-xl mx-auto mb-16 leading-relaxed">
                         Have a project in mind or want to discuss opportunities? I&apos;d love
                         to hear from you.
                     </p>
                 </SectionReveal>
 
-                <div className="grid md:grid-cols-5 gap-12">
+                <SectionReveal delay={0.05} className="mb-6">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">
+                        Get in Touch
+                    </h3>
+                </SectionReveal>
+
+                <div className="grid md:grid-cols-5 gap-8 items-start">
                     <SectionReveal delay={0.1} className="md:col-span-2">
-                        <div className="space-y-6">
-                            <h3 className="font-semibold text-foreground mb-6">
-                                Get in Touch
-                            </h3>
+                        <div className="space-y-4">
                             {contactInfo.map((info) => (
-                                <div key={info.label} className="flex items-start gap-4">
-                                    <div className="p-2 bg-accent/10 rounded-lg">
-                                        <info.icon className="text-accent" size={18} />
+                                <div key={info.label} className="group flex items-start gap-4 p-4 bg-surface/35 backdrop-blur-sm border border-border/70 rounded-xl hover:border-accent/30 hover:bg-surface/50 transition-all duration-300">
+                                    <div className="p-2.5 bg-accent/8 border border-accent/15 rounded-lg group-hover:bg-accent/12 group-hover:scale-105 transition-all duration-350">
+                                        <info.icon className="text-accent" size={16} />
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-muted-foreground mb-0.5">
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
                                             {info.label}
                                         </p>
                                         {info.href ? (
@@ -106,12 +111,12 @@ export default function Contact() {
                                                 href={info.href}
                                                 target={info.href.startsWith("http") ? "_blank" : undefined}
                                                 rel={info.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                                                className="text-foreground hover:text-accent transition-colors text-sm"
+                                                className="text-foreground hover:text-accent font-semibold transition-colors text-sm break-all"
                                             >
                                                 {info.value}
                                             </a>
                                         ) : (
-                                            <p className="text-foreground text-sm">{info.value}</p>
+                                            <p className="text-foreground font-semibold text-sm break-all">{info.value}</p>
                                         )}
                                     </div>
                                 </div>
@@ -120,7 +125,7 @@ export default function Contact() {
                     </SectionReveal>
 
                     <SectionReveal delay={0.2} className="md:col-span-3">
-                        <div className="p-6 bg-surface border border-border rounded-lg">
+                        <div className="p-6 sm:p-8 bg-surface/40 backdrop-blur-sm border border-border/80 rounded-2xl shadow-xl">
                             <ContactForm />
                         </div>
                     </SectionReveal>
