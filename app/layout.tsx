@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  title: "Ishan Vaidya | Computer Science Undergraduate",
+  title: "Ishan Vaidya | Portfolio",
   description:
     "Portfolio of Ishan Vaidya, a Computer Science undergraduate specializing in Machine Learning, Computer Vision, and Software Development.",
   keywords: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://ishanvaidya.github.io",
     siteName: "Ishan Vaidya Portfolio",
-    title: "Ishan Vaidya | Computer Science Undergraduate",
+    title: "Ishan Vaidya | Portfolio",
     description:
       "Portfolio of Ishan Vaidya, a Computer Science undergraduate specializing in Machine Learning, Computer Vision, and Software Development.",
     images: [
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ishan Vaidya | Computer Science Undergraduate",
+    title: "Ishan Vaidya | Portfolio",
     description:
       "Portfolio of Ishan Vaidya, a Computer Science undergraduate specializing in Machine Learning, Computer Vision, and Software Development.",
     images: ["/og-image.png"],
