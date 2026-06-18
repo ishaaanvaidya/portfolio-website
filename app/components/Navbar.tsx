@@ -19,25 +19,43 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
+        // Throttle scroll handler with requestAnimationFrame
+        let ticking = false;
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
-
-            const sections = navLinks.map((link) => link.href.slice(1));
-            const scrollPosition = window.scrollY + 100;
-
-            for (let i = sections.length - 1; i >= 0; i--) {
-                const element = document.getElementById(sections[i]);
-                if (element && element.offsetTop <= scrollPosition) {
-                    setActiveSection(sections[i]);
-                    break;
-                }
-            }
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                setIsScrolled(window.scrollY > 20);
+                ticking = false;
+            });
         };
 
-        window.addEventListener("scroll", handleScroll);
+        // Use IntersectionObserver for active section detection (much cheaper than offsetTop polling)
+        const observerCallback: IntersectionObserverCallback = (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id);
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, {
+            rootMargin: "-40% 0px -55% 0px",  // active when section is in the middle 5% of viewport
+            threshold: 0,
+        });
+
+        navLinks.forEach((link) => {
+            const el = document.getElementById(link.href.slice(1));
+            if (el) observer.observe(el);
+        });
+
+        window.addEventListener("scroll", handleScroll, { passive: true });
         handleScroll();
 
-        return () => window.removeEventListener("scroll", handleScroll);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            observer.disconnect();
+        };
     }, []);
 
     const scrollToSection = (href: string) => {
@@ -50,20 +68,22 @@ export default function Navbar() {
 
     return (
         <>
-            <motion.nav
-                initial={{ y: -100, x: "-50%" }}
-                animate={{ y: 0, x: "-50%" }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className={cn(
-                    "fixed top-4 left-1/2 z-50 transition-all duration-300 md:w-max w-[95%] rounded-full border border-border/40 px-6 shadow-2xl",
-                    isScrolled
-                        ? "bg-background/75 backdrop-blur-md border-border/60 shadow-black/60 py-2"
-                        : "bg-background/25 backdrop-blur-sm shadow-none py-3"
-                )}
-            >
-                <div className="w-full">
-                    <div className="flex items-center justify-start h-12 w-full gap-4">
-                        {/* Center: Navigation links */}
+            <div className="fixed z-50 flex pointer-events-none top-2 left-2 md:top-4 md:left-0 md:right-0 md:justify-center">
+                <motion.nav
+                    initial={{ y: -100 }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className={cn(
+                        "pointer-events-auto transition-all duration-300 w-max",
+                        "max-md:bg-transparent max-md:border-none max-md:shadow-none max-md:p-0 max-md:backdrop-blur-none",
+                        "md:rounded-full md:border md:border-border/40 md:px-5 md:shadow-2xl",
+                        isScrolled
+                            ? "md:bg-background/75 md:backdrop-blur-md md:border-border/60 md:shadow-black/60 md:py-2"
+                            : "md:bg-background/25 md:backdrop-blur-sm md:shadow-none md:py-3"
+                    )}
+                >
+                    <div className="flex items-center justify-between h-12 gap-6">
+                        {/* Desktop: Navigation links */}
                         <div className="hidden md:flex items-center space-x-1 flex-1">
                             {navLinks.map((link) => (
                                 <button
@@ -99,15 +119,15 @@ export default function Navbar() {
                         {/* Mobile: Hamburger menu */}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden ml-auto p-2 text-foreground hover:text-accent transition-colors rounded-full hover:bg-surface border border-transparent hover:border-border/40"
+                            className="md:hidden p-2 text-foreground hover:text-accent transition-colors rounded-full hover:bg-surface border border-transparent hover:border-border/40"
                             aria-label="Toggle menu"
                             aria-expanded={isMobileMenuOpen}
                         >
                             {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
                         </button>
                     </div>
-                </div>
-            </motion.nav>
+                </motion.nav>
+            </div>
 
             {/* Mobile menu */}
             <AnimatePresence>

@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ishan Vaidya — Portfolio
 
-## Getting Started
+Personal portfolio website for Ishan Vaidya, Computer Science undergraduate specializing in Machine Learning, Computer Vision, and Software Engineering.
 
-First, run the development server:
+## Tech Stack
+
+- **Framework:** Next.js 16.2.9 (App Router, static export)
+- **UI:** React 19.2.4, Tailwind CSS v4
+- **Animations:** Framer Motion 12
+- **Icons:** Lucide React
+- **Fonts:** Inter (sans), JetBrains Mono (mono) — via `next/font`
+- **Forms:** Formspree
+
+## Local Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Run dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# → http://localhost:3000
+
+# Type check
+npx tsc --noEmit
+
+# Lint
+npm run lint
+
+# Production build (outputs to ./out for static export)
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+  layout.tsx          Root layout, metadata, fonts
+  page.tsx            Home page (assembles all sections)
+  globals.css         Tailwind v4 + theme tokens + keyframes
+  components/         Reusable UI (Navbar, ContactForm, StarryBackground, etc.)
+  sections/           Page sections (Hero, About, Projects, Skills, Experience, Contact, Footer)
+lib/
+  utils.ts            cn() class-name merge helper
+public/               Static assets (favicon, resume PDF, og-image, sitemap, robots.txt)
+next.config.ts        Next.js config (output: "export", trailingSlash: true)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment
 
-## Learn More
+This site is configured for **GitHub Pages** via static export (`output: "export"` in `next.config.ts`).
 
-To learn more about Next.js, take a look at the following resources:
+The build output in `out/` is fully static and can be served from any static host (GitHub Pages, Netlify, Vercel, Cloudflare Pages).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Live URL: https://ishanvaidya.github.io/
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Customization
 
-## Deploy on Vercel
+- **Colors:** Edit CSS variables in `app/globals.css` (`--color-background`, `--color-accent`, etc.)
+- **Content:** Edit the section files in `app/sections/` (each section's content is hardcoded at the top of the file)
+- **Projects:** Edit the `projects` array in `app/sections/Projects.tsx`
+- **Skills:** Edit the `skillCategories` array in `app/sections/Skills.tsx`
+- **Experience:** Edit the `experiences` array in `app/sections/Experience.tsx`
+- **Contact info:** Edit the `contactInfo` array in `app/sections/Contact.tsx` and the Formspree endpoint in `app/components/ContactForm.tsx`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Personal portfolio. Code structure is free to reference; content (name, projects, experience) is personal.

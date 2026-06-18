@@ -9,6 +9,7 @@ interface FormData {
     name: string;
     email: string;
     message: string;
+    _gotcha?: string;
 }
 
 interface FormErrors {
@@ -22,6 +23,7 @@ export default function ContactForm() {
         name: "",
         email: "",
         message: "",
+        _gotcha: "",
     });
     const [errors, setErrors] = useState<FormErrors>({});
     const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
@@ -69,7 +71,7 @@ export default function ContactForm() {
 
             if (response.ok) {
                 setStatus("success");
-                setFormData({ name: "", email: "", message: "" });
+                setFormData({ name: "", email: "", message: "", _gotcha: "" });
             } else {
                 setStatus("error");
             }
@@ -89,7 +91,19 @@ export default function ContactForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate suppressHydrationWarning>
+            {/* Honeypot anti-spam field — bots fill this in, humans never see it. Formspree silently drops these submissions. */}
+            <input
+                suppressHydrationWarning
+                type="text"
+                name="_gotcha"
+                value={formData._gotcha}
+                onChange={handleChange}
+                style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+            />
             <div>
                 <label
                     htmlFor="name"
@@ -98,6 +112,7 @@ export default function ContactForm() {
                     Name
                 </label>
                 <input
+                    suppressHydrationWarning
                     type="text"
                     id="name"
                     name="name"
@@ -135,6 +150,7 @@ export default function ContactForm() {
                     Email Address
                 </label>
                 <input
+                    suppressHydrationWarning
                     type="email"
                     id="email"
                     name="email"
@@ -172,6 +188,7 @@ export default function ContactForm() {
                     Message
                 </label>
                 <textarea
+                    suppressHydrationWarning
                     id="message"
                     name="message"
                     value={formData.message}
@@ -202,6 +219,7 @@ export default function ContactForm() {
             </div>
 
             <button
+                suppressHydrationWarning
                 type="submit"
                 disabled={status === "submitting" || status === "success"}
                 className={cn(
