@@ -1,77 +1,69 @@
+import json
+import os
+import urllib.request
 from http.server import BaseHTTPRequestHandler
-import json, os, urllib.request
 
-# ── Paste your full KNOWLEDGE_BASE and SYSTEM_PROMPT here ──────────────────
-# (copy from chatbot-backend/knowledge_base.py)
-KNOWLEDGE_BASE = """
-Knowledge base built from Ishan Vaidya's portfolio website and resume.
-Sources: https://ishanvaidya.vercel.app/ + resume PDF
-"""
+# ═══════════════════════════════════════════════════════════════
+# CONFIG
+# ═══════════════════════════════════════════════════════════════
+
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
+MODEL_ID = os.environ.get("MODEL_ID", "deepseek-ai/DeepSeek-V4-Flash")
+PROVIDER = os.environ.get("HF_PROVIDER", "novita")
+API_URL = f"https://router.huggingface.co/{PROVIDER}/v1/chat/completions"
+
+# ═══════════════════════════════════════════════════════════════
+# KNOWLEDGE BASE (embedded to avoid file import issues on Vercel)
+# ═══════════════════════════════════════════════════════════════
 
 KNOWLEDGE_BASE = """
 === ABOUT ===
 Name: Ishan Vaidya
 Role: Computer Science Undergraduate
-Summary: CS undergrad with experience in machine learning, computer vision, and full-stack development. Builds scalable Python applications, LSTM predictive models, and CNN architectures.
+Location: Dehradun, India
+Availability: Open to remote work and internships worldwide
 
 === CONTACT ===
 Email: ishan3vaidya@gmail.com
 Phone: +91 6377220093
 LinkedIn: https://www.linkedin.com/in/ishan-vaidya/
 GitHub: https://github.com/ishaaanvaidya
-Location: Dehradun, India. Open to remote work and internships worldwide.
-Contact Form: On this page — scroll to the Contact section at the bottom, fill in your name, email, and message.
 Resume: https://ishanvaidya.vercel.app/Ishan_Vaidya_Resume.pdf
 
 === EDUCATION ===
-B.Tech Computer Science Engineering — UPES, Dehradun (Jul 2023 – Jun 2027, ongoing)
+B.Tech CSE — UPES, Dehradun (2023–2027, ongoing)
 Class 12 CBSE — Birla Shishu Vihar, Pilani — 81.2% (2022)
 Class 10 CBSE — Birla Shishu Vihar, Pilani — 88.4% (2020)
 
 === INTERNSHIP ===
-Role: Software Development Intern
-Company: Rams Creative Technologies Pvt. Ltd., Jaipur
-Duration: Jun 2025 – Jul 2025 (8 weeks)
-Work: Built an LSTM model to predict stock prices. Achieved 85% accuracy through feature engineering and hyperparameter tuning. Visualized results using Matplotlib.
+Rams Creative Technologies Pvt. Ltd., Jaipur — Jun 2025 – Jul 2025 (8 weeks)
+Built an LSTM stock price predictor achieving 85% accuracy.
 
 === PROJECTS ===
-1. Driver Drowsiness Detection
-   GitHub: https://github.com/ishaaanvaidya/driver-drowsiness-detector
-   Stack: Python, OpenCV, MediaPipe, Raspberry Pi 4
-   Details: Real-time system that tracks Eye Aspect Ratio via MediaPipe's 468-point facial mesh. Triggers visual alerts on detecting drowsiness. Deployed on Raspberry Pi 4.
-
-2. HDFC Stock Prediction
-   GitHub: https://github.com/ishaaanvaidya/hdfc-stock-prediction-lstm
-   Stack: Python, LSTM, TensorFlow, Keras
-   Details: LSTM time-series forecasting for HDFC stock prices using feature engineering and ensemble techniques.
-
-3. Pothole Detection
-   GitHub: https://github.com/ishaaanvaidya/pothole-detection-cnn
-   Stack: Python, CNN, TensorFlow, OpenCV
-   Details: CNN trained on 2,000+ road images. Achieves 92% confidence in pothole identification and classifies severity levels.
+1. Driver Drowsiness Detection — real-time eye tracking with OpenCV + MediaPipe, deployed on Raspberry Pi 4.
+2. HDFC Stock Prediction — LSTM time-series forecasting with TensorFlow and Keras.
+3. Pothole Detection — CNN trained on 2,000+ road images, 92% accuracy, TensorFlow + OpenCV.
 
 === SKILLS ===
 Languages: Python, SQL / MySQL
-ML Frameworks: TensorFlow, PyTorch, Keras
-Computer Vision: OpenCV, MediaPipe
+ML: TensorFlow, PyTorch, Keras
+CV: OpenCV, MediaPipe
 Data: NumPy, Pandas, Matplotlib
 Tools: Git, GitHub
-Soft Skills: Communication, Leadership, Teamwork, Problem-Solving
 """.strip()
 
-SYSTEM_PROMPT = f"""
-You are a concise assistant embedded in Ishan Vaidya's portfolio website. The user is already on the website, so never link to the portfolio itself.
+SYSTEM_PROMPT = f"""You are a concise assistant embedded in Ishan Vaidya's portfolio website. The user is already on the website.
 
 STRICT RULES:
 1. Answer ONLY what was directly asked. Nothing more.
-2. Never use **bold** or any markdown formatting except bullet lists and links.
-3. For URLs to external sites (LinkedIn, GitHub, resume), use markdown links: [display text](url)
-4. Never mention or link to ishanvaidya.vercel.app — the user is already here. Instead say things like "scroll to the Contact section" or "check the Projects section above".
-5. When listing multiple items (projects, skills, etc.), use a bullet list — one item per line starting with "- ".
+2. Never use **bold** or markdown except bullet lists and [text](url) links.
+3. Never mention or link to ishanvaidya.vercel.app — the user is already here. Say "scroll to the Contact section" instead.
+4. For external URLs (LinkedIn, GitHub, resume), use markdown links: [display text](url)
+5. When listing multiple items, use "- " bullet lists, one item per line.
 6. Keep each bullet to one short sentence.
 7. Only answer questions about Ishan. For anything else: "I only have info about Ishan — you can reach him at ishan3vaidya@gmail.com."
 
-EXAMPLES OF CORRECT BEHAVIOUR:
+EXAMPLES:
 Q: "Where did he intern?" → "Ishan interned at Rams Creative Technologies Pvt. Ltd. in Jaipur, India."
 Q: "List his projects" →
 - Driver Drowsiness Detection — real-time eye tracking system using OpenCV and MediaPipe, deployed on Raspberry Pi 4.
@@ -87,55 +79,177 @@ Q: "What are his skills?" →
 
 --- KNOWLEDGE BASE ---
 {KNOWLEDGE_BASE}
---- END KNOWLEDGE BASE ---
-"""
-# ───────────────────────────────────────────────────────────────────────────
+--- END KNOWLEDGE BASE ---"""
 
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
-MODEL_ID  = "deepseek-ai/DeepSeek-V4-Flash"
-API_URL   = "https://router.huggingface.co/novita/v1/chat/completions"
+# ═══════════════════════════════════════════════════════════════
+# INTENT DETECTION (deterministic, zero cost)
+# ═══════════════════════════════════════════════════════════════
+
+def detect_intent(user_msg: str):
+    text = "".join(c if c.isalnum() or c.isspace() else " " for c in user_msg.lower().strip())
+    intents = {
+        "contact": ["contact", "reach", "email", "phone", "call", "message", "get in touch", "talk to", "connect with"],
+        "projects": ["project", "projects", "built", "work", "portfolio", "what did he make", "what has he done"],
+        "skills": ["skill", "skills", "tech stack", "technologies", "know", "can he do", "expertise", "proficient"],
+        "internship": ["intern", "internship", "experience", "worked", "company", "job", "where did he work"],
+        "education": ["education", "study", "studies", "college", "university", "degree", "school", "upes", "qualification"],
+        "about": ["who is", "about", "introduce", "tell me about", "who", "what does he do", "background"],
+        "contact_form": ["contact form", "form", "where is the form", "how to send message"],
+        "resume": ["resume", "cv", "download"],
+    }
+    for intent, keywords in intents.items():
+        if any(kw in text for kw in keywords):
+            return intent
+    return None
+
+def generate_programmatic_reply(intent: str) -> str:
+    if intent == "contact":
+        return "You can email him at ishan3vaidya@gmail.com, connect on [LinkedIn](https://www.linkedin.com/in/ishan-vaidya/), or scroll to the Contact section at the bottom of this page."
+    elif intent == "projects":
+        return "- Driver Drowsiness Detection — real-time eye tracking system using OpenCV and MediaPipe, deployed on Raspberry Pi 4.\n- HDFC Stock Prediction — LSTM model forecasting HDFC stock prices with TensorFlow and Keras.\n- Pothole Detection — CNN trained on 2,000+ road images achieving 92% accuracy, built with TensorFlow and OpenCV."
+    elif intent == "skills":
+        return "- Languages: Python, SQL / MySQL\n- ML: TensorFlow, PyTorch, Keras\n- Computer Vision: OpenCV, MediaPipe\n- Data: NumPy, Pandas, Matplotlib\n- Tools: Git, GitHub"
+    elif intent == "internship":
+        return "Ishan interned at Rams Creative Technologies Pvt. Ltd. in Jaipur, India."
+    elif intent == "education":
+        return "- B.Tech CSE — UPES, Dehradun (2023–2027, ongoing)\n- Class 12 CBSE — Birla Shishu Vihar, Pilani — 81.2% (2022)\n- Class 10 CBSE — Birla Shishu Vihar, Pilani — 88.4% (2020)"
+    elif intent == "about":
+        return "Ishan Vaidya is a Computer Science undergraduate at UPES, Dehradun. He specializes in machine learning, computer vision, and software engineering. Based in Dehradun, India, he's open to remote work and internships worldwide."
+    elif intent == "contact_form":
+        return "Scroll to the Contact section at the bottom of this page."
+    elif intent == "resume":
+        return "You can download his resume here: [Resume](https://ishanvaidya.vercel.app/Ishan_Vaidya_Resume.pdf)."
+    else:
+        return "I only have info about Ishan — you can reach him at ishan3vaidya@gmail.com."
+
+def post_process(text: str) -> str:
+    """Strip bold markdown, remove self-referential links, enforce brevity."""
+    import re as _re
+    cleaned = _re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
+    cleaned = _re.sub(r"(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)", r"\1", cleaned)
+
+    # Remove self-referential website mentions
+    patterns = [
+        r"https?://ishanvaidya\.vercel\.app/?",
+        r"ishanvaidya\.vercel\.app",
+        r"his portfolio (website|site)",
+        r"the portfolio (website|site)",
+        r"on (his|the) website",
+    ]
+    for p in patterns:
+        cleaned = _re.sub(p, "", cleaned, flags=_re.IGNORECASE)
+
+    cleaned = _re.sub(r"\s+", " ", cleaned)
+    cleaned = _re.sub(r"\( ?\)", "", cleaned)
+    cleaned = _re.sub(r",\s*,", ",", cleaned)
+    cleaned = _re.sub(r"\s+\.", ".", cleaned)
+    cleaned = _re.sub(r"\s+,", ",", cleaned)
+
+    # Truncate non-list to 2 sentences
+    lines = cleaned.strip().split("\n")
+    has_bullets = any(l.strip().startswith("- ") for l in lines)
+    if not has_bullets:
+        sentences = _re.split(r"(?<=[.!?])\s+", cleaned.strip())
+        if len(sentences) > 2:
+            cleaned = " ".join(sentences[:2])
+
+    return cleaned.strip()
+
+# ═══════════════════════════════════════════════════════════════
+# LLM FALLBACK
+# ═══════════════════════════════════════════════════════════════
+
+def llm_reply(messages: list) -> str:
+    hf_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    hf_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-10:]]
+
+    payload = json.dumps({
+        "model": MODEL_ID,
+        "messages": hf_messages,
+        "max_tokens": 250,
+        "temperature": 0.3,
+    }).encode()
+
+    req = urllib.request.Request(
+        API_URL,
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {HF_TOKEN}",
+        },
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read())
+        raw = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+        return post_process(raw)
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode()
+        raise Exception(f"HF API HTTP {e.code}: {error_body}")
+    except Exception as e:
+        raise Exception(f"LLM call failed: {str(e)}")
+
+# ═══════════════════════════════════════════════════════════════
+# HTTP HANDLER
+# ═══════════════════════════════════════════════════════════════
 
 class handler(BaseHTTPRequestHandler):
-
-    def do_POST(self):
-        length  = int(self.headers.get("Content-Length", 0))
-        body    = json.loads(self.rfile.read(length))
-        messages = body.get("messages", [])[-10:]
-
-        payload = json.dumps({
-            "model": MODEL_ID,
-            "messages": [{"role": "system", "content": SYSTEM_PROMPT}]
-                        + [{"role": m["role"], "content": m["content"]} for m in messages],
-            "max_tokens": 300,
-            "temperature": 0.6,
-        }).encode()
-
-        req = urllib.request.Request(
-            API_URL,
-            data=payload,
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {HF_TOKEN}"},
-            method="POST",
-        )
-
-        try:
-            with urllib.request.urlopen(req) as resp:
-                data  = json.loads(resp.read())
-            reply = data["choices"][0]["message"]["content"].strip()
-            self._respond(200, {"reply": reply})
-        except Exception as e:
-            self._respond(500, {"detail": str(e)})
 
     def do_OPTIONS(self):
         self._respond(200, {})
 
+    def do_POST(self):
+        try:
+            # Read body
+            length = int(self.headers.get("Content-Length", 0))
+            if length == 0:
+                self._respond(400, {"detail": "Empty body"})
+                return
+
+            body = json.loads(self.rfile.read(length))
+            messages = body.get("messages", [])
+
+            if not messages:
+                self._respond(400, {"detail": "messages list is empty"})
+                return
+
+            # Check for HF_TOKEN
+            if not HF_TOKEN:
+                self._respond(500, {"detail": "HF_TOKEN not configured"})
+                return
+
+            # Intent detection
+            last_msg = messages[-1].get("content", "")
+            intent = detect_intent(last_msg)
+
+            if intent:
+                # Instant reply
+                reply = generate_programmatic_reply(intent)
+                self._respond(200, {"reply": reply, "source": "programmatic"})
+                return
+
+            # LLM fallback
+            try:
+                reply = llm_reply(messages)
+                self._respond(200, {"reply": reply, "source": "llm"})
+            except Exception as e:
+                self._respond(502, {"detail": str(e)})
+
+        except json.JSONDecodeError:
+            self._respond(400, {"detail": "Invalid JSON"})
+        except Exception as e:
+            self._respond(500, {"detail": f"Internal error: {str(e)}"})
+
     def _respond(self, status: int, body: dict):
         self.send_response(status)
-        self.send_header("Content-Type",  "application/json")
-        self.send_header("Access-Control-Allow-Origin",  "*")
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
         self.wfile.write(json.dumps(body).encode())
 
-    def log_message(self, *args):
-        pass  # silence default request logs
+    def log_message(self, format, *args):
+        pass  # silence logs
