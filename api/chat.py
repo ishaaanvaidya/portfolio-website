@@ -9,8 +9,8 @@ from http.server import BaseHTTPRequestHandler
 # ═══════════════════════════════════════════════════════════════
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-MODEL_ID = os.environ.get("MODEL_ID", "meta-llama/Meta-Llama-3.1-8B-Instruct")
-PROVIDER = os.environ.get("HF_PROVIDER", "together")
+MODEL_ID = os.environ.get("MODEL_ID", "XiaomiMiMo/MiMo-V2.5-Pro")
+PROVIDER = os.environ.get("HF_PROVIDER", "deepinfra")
 
 # CORRECT HF Inference Providers API endpoint
 # Provider goes in the request BODY, not the URL path
