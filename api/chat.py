@@ -1,6 +1,7 @@
 import json
 import os
 import urllib.request
+import urllib.error
 from http.server import BaseHTTPRequestHandler
 
 # ═══════════════════════════════════════════════════════════════
@@ -8,12 +9,15 @@ from http.server import BaseHTTPRequestHandler
 # ═══════════════════════════════════════════════════════════════
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-MODEL_ID = os.environ.get("MODEL_ID", "deepseek-ai/DeepSeek-V4-Flash")
-PROVIDER = os.environ.get("HF_PROVIDER", "novita")
-API_URL = f"https://router.huggingface.co/{PROVIDER}/v1/chat/completions"
+MODEL_ID = os.environ.get("MODEL_ID", "meta-llama/Meta-Llama-3.1-8B-Instruct")
+PROVIDER = os.environ.get("HF_PROVIDER", "together")
+
+# CORRECT HF Inference Providers API endpoint
+# Provider goes in the request BODY, not the URL path
+API_URL = "https://router.huggingface.co/v1/chat/completions"
 
 # ═══════════════════════════════════════════════════════════════
-# KNOWLEDGE BASE (embedded to avoid file import issues on Vercel)
+# KNOWLEDGE BASE
 # ═══════════════════════════════════════════════════════════════
 
 KNOWLEDGE_BASE = """
@@ -82,7 +86,7 @@ Q: "What are his skills?" →
 --- END KNOWLEDGE BASE ---"""
 
 # ═══════════════════════════════════════════════════════════════
-# INTENT DETECTION (deterministic, zero cost)
+# INTENT DETECTION
 # ═══════════════════════════════════════════════════════════════
 
 def detect_intent(user_msg: str):
@@ -123,12 +127,10 @@ def generate_programmatic_reply(intent: str) -> str:
         return "I only have info about Ishan — you can reach him at ishan3vaidya@gmail.com."
 
 def post_process(text: str) -> str:
-    """Strip bold markdown, remove self-referential links, enforce brevity."""
     import re as _re
     cleaned = _re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
     cleaned = _re.sub(r"(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)", r"\1", cleaned)
 
-    # Remove self-referential website mentions
     patterns = [
         r"https?://ishanvaidya\.vercel\.app/?",
         r"ishanvaidya\.vercel\.app",
@@ -145,7 +147,6 @@ def post_process(text: str) -> str:
     cleaned = _re.sub(r"\s+\.", ".", cleaned)
     cleaned = _re.sub(r"\s+,", ",", cleaned)
 
-    # Truncate non-list to 2 sentences
     lines = cleaned.strip().split("\n")
     has_bullets = any(l.strip().startswith("- ") for l in lines)
     if not has_bullets:
@@ -163,11 +164,13 @@ def llm_reply(messages: list) -> str:
     hf_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     hf_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-10:]]
 
+    # CORRECT: provider goes in the payload, not the URL
     payload = json.dumps({
         "model": MODEL_ID,
         "messages": hf_messages,
         "max_tokens": 250,
         "temperature": 0.3,
+        "provider": PROVIDER,
     }).encode()
 
     req = urllib.request.Request(
@@ -202,7 +205,6 @@ class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            # Read body
             length = int(self.headers.get("Content-Length", 0))
             if length == 0:
                 self._respond(400, {"detail": "Empty body"})
@@ -215,7 +217,6 @@ class handler(BaseHTTPRequestHandler):
                 self._respond(400, {"detail": "messages list is empty"})
                 return
 
-            # Check for HF_TOKEN
             if not HF_TOKEN:
                 self._respond(500, {"detail": "HF_TOKEN not configured"})
                 return
@@ -225,7 +226,6 @@ class handler(BaseHTTPRequestHandler):
             intent = detect_intent(last_msg)
 
             if intent:
-                # Instant reply
                 reply = generate_programmatic_reply(intent)
                 self._respond(200, {"reply": reply, "source": "programmatic"})
                 return
@@ -252,4 +252,4 @@ class handler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(body).encode())
 
     def log_message(self, format, *args):
-        pass  # silence logs
+        pass
