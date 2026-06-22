@@ -8,6 +8,7 @@ import Skills from "./sections/Skills";
 import Experience from "./sections/Experience";
 import Contact from "./sections/Contact";
 import Footer from "./sections/Footer";
+import ChatBot from "./components/ChatBot";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       <Experience />
       <Contact />
       <Footer />
+      <ChatBot />
     </main>
   );
 }
