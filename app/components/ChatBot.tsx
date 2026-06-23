@@ -22,7 +22,7 @@ const SUGGESTED = [
 
 // ── Renders inline text: plain + [label](url) links ─────────────────────
 function InlineText({ text }: { text: string }) {
-    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g;
+    const linkRegex = /\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\)]+)\)/g;
     const parts: React.ReactNode[] = [];
     let last = 0;
     let match: RegExpExecArray | null;

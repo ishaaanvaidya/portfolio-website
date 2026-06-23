@@ -9,11 +9,8 @@ from http.server import BaseHTTPRequestHandler
 # ═══════════════════════════════════════════════════════════════
 
 HF_TOKEN = os.environ.get("HF_TOKEN", "")
-MODEL_ID = os.environ.get("MODEL_ID", "XiaomiMiMo/MiMo-V2.5-Pro")
+MODEL_ID = os.environ.get("MODEL_ID", "deepseek-ai/DeepSeek-V4-Flash")
 PROVIDER = os.environ.get("HF_PROVIDER", "deepinfra")
-
-# CORRECT HF Inference Providers API endpoint
-# Provider goes in the request BODY, not the URL path
 API_URL = "https://router.huggingface.co/v1/chat/completions"
 
 # ═══════════════════════════════════════════════════════════════
@@ -21,54 +18,68 @@ API_URL = "https://router.huggingface.co/v1/chat/completions"
 # ═══════════════════════════════════════════════════════════════
 
 KNOWLEDGE_BASE = """
-=== ABOUT ===
-Name: Ishan Vaidya
-Role: Computer Science Undergraduate
-Location: Dehradun, India
-Availability: Open to remote work and internships worldwide
+=== PORTFOLIO NAVIGATION ===
+- The website is divided into several main sections:
+  1. Hero (top of the page): Welcoming introduction.
+  2. About: Information on Ishan's background and UPES Dehradun education.
+  3. Projects: Showcase of his personal projects (Driver Drowsiness Detection, Stock Prediction, Pothole Detection).
+  4. Skills: List of technologies he is familiar with.
+  5. Experience: Information on his internship at Rams Creative Technologies.
+  6. Contact (bottom of the page): Form to send him a direct message, links to email/LinkedIn/GitHub.
+- To navigate to any section, users can click the links in the Navigation Bar at the top of the page (About, Projects, Skills, Experience, Contact) or scroll.
 
-=== CONTACT ===
-Email: ishan3vaidya@gmail.com
-Phone: +91 6377220093
-LinkedIn: https://www.linkedin.com/in/ishan-vaidya/
-GitHub: https://github.com/ishaaanvaidya
-Resume: https://ishanvaidya.vercel.app/Ishan_Vaidya_Resume.pdf
+=== ABOUT ISHAN VAIDYA ===
+- Name: Ishan Vaidya
+- Role: Computer Science Undergraduate
+- Location: Dehradun, India
+- Availability: Open to remote work and internships worldwide
+- Resume: Available for download at the top right of the page or directly via [Resume](/Ishan_Vaidya_Resume.pdf)
+
+=== CONTACT DETAILS ===
+- Email: ishan3vaidya@gmail.com
+- Phone: +91 6377220093
+- LinkedIn: [LinkedIn](https://www.linkedin.com/in/ishan-vaidya/)
+- GitHub: [GitHub](https://github.com/ishaaanvaidya)
+- Contact Form: Scroll to the Contact section at the bottom of this page.
 
 === EDUCATION ===
-B.Tech CSE — UPES, Dehradun (2023–2027, ongoing)
-Class 12 CBSE — Birla Shishu Vihar, Pilani — 81.2% (2022)
-Class 10 CBSE — Birla Shishu Vihar, Pilani — 88.4% (2020)
+- B.Tech Computer Science Engineering: UPES, Dehradun (2023–2027, ongoing)
+- Class 12 CBSE: Birla Shishu Vihar, Pilani — 81.2% (2022)
+- Class 10 CBSE: Birla Shishu Vihar, Pilani — 88.4% (2020)
 
-=== INTERNSHIP ===
-Rams Creative Technologies Pvt. Ltd., Jaipur — Jun 2025 – Jul 2025 (8 weeks)
-Built an LSTM stock price predictor achieving 85% accuracy.
+=== INTERNSHIP EXPERIENCE ===
+- Software Development Intern: Rams Creative Technologies Pvt. Ltd., Jaipur (Jun 2025 – Jul 2025, 8 weeks)
+- Key Work: Built an LSTM stock price predictor achieving 85% accuracy.
 
 === PROJECTS ===
-1. Driver Drowsiness Detection — real-time eye tracking with OpenCV + MediaPipe, deployed on Raspberry Pi 4.
-2. HDFC Stock Prediction — LSTM time-series forecasting with TensorFlow and Keras.
-3. Pothole Detection — CNN trained on 2,000+ road images, 92% accuracy, TensorFlow + OpenCV.
+1. Driver Drowsiness Detection: Real-time eye tracking system using OpenCV and MediaPipe, deployed on Raspberry Pi 4.
+2. HDFC Stock Prediction: LSTM time-series forecasting model using TensorFlow and Keras.
+3. Pothole Detection: CNN model trained on 2,000+ road images with 92% accuracy, built using TensorFlow and OpenCV.
 
-=== SKILLS ===
-Languages: Python, SQL / MySQL
-ML: TensorFlow, PyTorch, Keras
-CV: OpenCV, MediaPipe
-Data: NumPy, Pandas, Matplotlib
-Tools: Git, GitHub
+=== TECHNICAL SKILLS ===
+- Languages: Python, SQL / MySQL
+- Machine Learning: TensorFlow, PyTorch, Keras
+- Computer Vision: OpenCV, MediaPipe
+- Data Libraries: NumPy, Pandas, Matplotlib
+- Tools: Git, GitHub
 """.strip()
 
-SYSTEM_PROMPT = f"""You are a concise assistant embedded in Ishan Vaidya's portfolio website. The user is already on the website.
+SYSTEM_PROMPT = f"""You are Ishan's AI assistant embedded in his portfolio website.
 
 STRICT RULES:
-1. Answer ONLY what was directly asked. Nothing more.
-2. Never use **bold** or markdown except bullet lists and [text](url) links.
-3. Never mention or link to ishanvaidya.vercel.app — the user is already here. Say "scroll to the Contact section" instead.
-4. For external URLs (LinkedIn, GitHub, resume), use markdown links: [display text](url)
-5. When listing multiple items, use "- " bullet lists, one item per line.
-6. Keep each bullet to one short sentence.
-7. Only answer questions about Ishan. For anything else: "I only have info about Ishan — you can reach him at ishan3vaidya@gmail.com."
+1. If the user asks who you are, introduce yourself as Ishan's AI assistant.
+2. Only answer questions about Ishan, his background, his resume, his experience, his skills, his projects, or how to navigate this website.
+3. If the query is about ANY other topic (e.g. general knowledge, math, programming/scripting tasks, other people, general questions), you MUST reply with exactly: "I only have info about Ishan" and nothing else.
+4. Answer ONLY what was directly asked. Keep it extremely concise and direct.
+5. Never use **bold** or markdown except bullet lists and [text](url) links.
+6. Never link to or mention "ishanvaidya.vercel.app" as a full host. Instead, use relative links like [Resume](/Ishan_Vaidya_Resume.pdf) or ask the user to scroll to the relevant section (e.g., "scroll to the Contact section at the bottom of this page").
+7. When listing multiple items, use "- " bullet lists, one item per line. Keep each bullet to one short sentence.
 
-EXAMPLES:
+EXAMPLES OF CORRECT BEHAVIOR:
+Q: "Who are you?" → "I am Ishan's AI assistant. I can answer questions about his skills, education, experience, projects, or help you navigate his website."
 Q: "Where did he intern?" → "Ishan interned at Rams Creative Technologies Pvt. Ltd. in Jaipur, India."
+Q: "Write a python script to reverse a list" → "I only have info about Ishan"
+Q: "What is the capital of France?" → "I only have info about Ishan"
 Q: "List his projects" →
 - Driver Drowsiness Detection — real-time eye tracking system using OpenCV and MediaPipe, deployed on Raspberry Pi 4.
 - HDFC Stock Prediction — LSTM model forecasting HDFC stock prices with TensorFlow and Keras.
@@ -86,90 +97,64 @@ Q: "What are his skills?" →
 --- END KNOWLEDGE BASE ---"""
 
 # ═══════════════════════════════════════════════════════════════
-# INTENT DETECTION
+# POST PROCESSING
 # ═══════════════════════════════════════════════════════════════
-
-def detect_intent(user_msg: str):
-    text = "".join(c if c.isalnum() or c.isspace() else " " for c in user_msg.lower().strip())
-    intents = {
-        "contact": ["contact", "reach", "email", "phone", "call", "message", "get in touch", "talk to", "connect with"],
-        "projects": ["project", "projects", "built", "work", "portfolio", "what did he make", "what has he done"],
-        "skills": ["skill", "skills", "tech stack", "technologies", "know", "can he do", "expertise", "proficient"],
-        "internship": ["intern", "internship", "experience", "worked", "company", "job", "where did he work"],
-        "education": ["education", "study", "studies", "college", "university", "degree", "school", "upes", "qualification"],
-        "about": ["who is", "about", "introduce", "tell me about", "who", "what does he do", "background"],
-        "contact_form": ["contact form", "form", "where is the form", "how to send message"],
-        "resume": ["resume", "cv", "download"],
-    }
-    for intent, keywords in intents.items():
-        if any(kw in text for kw in keywords):
-            return intent
-    return None
-
-def generate_programmatic_reply(intent: str) -> str:
-    if intent == "contact":
-        return "You can email him at ishan3vaidya@gmail.com, connect on [LinkedIn](https://www.linkedin.com/in/ishan-vaidya/), or scroll to the Contact section at the bottom of this page."
-    elif intent == "projects":
-        return "- Driver Drowsiness Detection — real-time eye tracking system using OpenCV and MediaPipe, deployed on Raspberry Pi 4.\n- HDFC Stock Prediction — LSTM model forecasting HDFC stock prices with TensorFlow and Keras.\n- Pothole Detection — CNN trained on 2,000+ road images achieving 92% accuracy, built with TensorFlow and OpenCV."
-    elif intent == "skills":
-        return "- Languages: Python, SQL / MySQL\n- ML: TensorFlow, PyTorch, Keras\n- Computer Vision: OpenCV, MediaPipe\n- Data: NumPy, Pandas, Matplotlib\n- Tools: Git, GitHub"
-    elif intent == "internship":
-        return "Ishan interned at Rams Creative Technologies Pvt. Ltd. in Jaipur, India."
-    elif intent == "education":
-        return "- B.Tech CSE — UPES, Dehradun (2023–2027, ongoing)\n- Class 12 CBSE — Birla Shishu Vihar, Pilani — 81.2% (2022)\n- Class 10 CBSE — Birla Shishu Vihar, Pilani — 88.4% (2020)"
-    elif intent == "about":
-        return "Ishan Vaidya is a Computer Science undergraduate at UPES, Dehradun. He specializes in machine learning, computer vision, and software engineering. Based in Dehradun, India, he's open to remote work and internships worldwide."
-    elif intent == "contact_form":
-        return "Scroll to the Contact section at the bottom of this page."
-    elif intent == "resume":
-        return "You can download his resume here: [Resume](https://ishanvaidya.vercel.app/Ishan_Vaidya_Resume.pdf)."
-    else:
-        return "I only have info about Ishan — you can reach him at ishan3vaidya@gmail.com."
 
 def post_process(text: str) -> str:
     import re as _re
-    cleaned = _re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
+    cleaned = text.strip()
+
+    # If the response is the strict fallback message, return it directly.
+    if "I only have info about Ishan" in cleaned:
+        return "I only have info about Ishan"
+
+    # Remove bold markdown (**text** -> text)
+    cleaned = _re.sub(r"\*\*([^*]+)\*\*", r"\1", cleaned)
+    # Remove single star italics (*text* -> text)
     cleaned = _re.sub(r"(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)", r"\1", cleaned)
 
-    patterns = [
-        r"https?://ishanvaidya\.vercel\.app/?",
-        r"ishanvaidya\.vercel\.app",
-        r"his portfolio (website|site)",
-        r"the portfolio (website|site)",
-        r"on (his|the) website",
-    ]
-    for p in patterns:
-        cleaned = _re.sub(p, "", cleaned, flags=_re.IGNORECASE)
+    # Convert absolute portfolio URLs to relative paths (so links remain functional)
+    cleaned = _re.sub(r"https?://ishanvaidya\.vercel\.app/?", "/", cleaned, flags=_re.IGNORECASE)
 
-    cleaned = _re.sub(r"\s+", " ", cleaned)
-    cleaned = _re.sub(r"\( ?\)", "", cleaned)
-    cleaned = _re.sub(r",\s*,", ",", cleaned)
-    cleaned = _re.sub(r"\s+\.", ".", cleaned)
-    cleaned = _re.sub(r"\s+,", ",", cleaned)
+    # Clean up whitespace line-by-line to preserve newlines for bullet lists
+    lines = []
+    for line in cleaned.split("\n"):
+        line_clean = line.strip()
+        if not line_clean:
+            continue
+        # Replace multiple spaces/tabs (not newlines) with a single space
+        line_clean = _re.sub(r"[ \t]+", " ", line_clean)
+        # Clean up punctuation spacing
+        line_clean = _re.sub(r"\( ?\)", "", line_clean)
+        line_clean = _re.sub(r",\s*,", ",", line_clean)
+        line_clean = _re.sub(r"\s+\.", ".", line_clean)
+        line_clean = _re.sub(r"\s+,", ",", line_clean)
+        lines.append(line_clean)
 
-    lines = cleaned.strip().split("\n")
+    # Limit to 2 sentences for paragraph responses (non-bulleted)
     has_bullets = any(l.strip().startswith("- ") for l in lines)
-    if not has_bullets:
-        sentences = _re.split(r"(?<=[.!?])\s+", cleaned.strip())
+    if not has_bullets and lines:
+        single_paragraph = " ".join(lines)
+        sentences = _re.split(r"(?<=[.!?])\s+", single_paragraph)
         if len(sentences) > 2:
-            cleaned = " ".join(sentences[:2])
+            return " ".join(sentences[:2])
+        return single_paragraph
 
-    return cleaned.strip()
+    return "\n".join(lines)
 
 # ═══════════════════════════════════════════════════════════════
-# LLM FALLBACK
+# LLM SERVICE
 # ═══════════════════════════════════════════════════════════════
 
 def llm_reply(messages: list) -> str:
     hf_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     hf_messages += [{"role": m["role"], "content": m["content"]} for m in messages[-10:]]
 
-    # CORRECT: provider goes in the payload, not the URL
     payload = json.dumps({
         "model": MODEL_ID,
         "messages": hf_messages,
         "max_tokens": 250,
-        "temperature": 0.3,
+        "temperature": 0.2,  # Low temperature for deterministic behavior
         "provider": PROVIDER,
     }).encode()
 
@@ -221,16 +206,6 @@ class handler(BaseHTTPRequestHandler):
                 self._respond(500, {"detail": "HF_TOKEN not configured"})
                 return
 
-            # Intent detection
-            last_msg = messages[-1].get("content", "")
-            intent = detect_intent(last_msg)
-
-            if intent:
-                reply = generate_programmatic_reply(intent)
-                self._respond(200, {"reply": reply, "source": "programmatic"})
-                return
-
-            # LLM fallback
             try:
                 reply = llm_reply(messages)
                 self._respond(200, {"reply": reply, "source": "llm"})
